@@ -71,6 +71,24 @@ func (repository UsersRepository) Search(nameOrNick string) ([]models.User, erro
 	return users, nil
 }
 
+// SearchByEmail return an user searching by email
+func (repository UsersRepository) SearchByEmail(email string) (models.User, error) {
+	line, err := repository.db.Query("select id, password from users where email = ?", email)
+	if err != nil {
+		return models.User{}, nil
+	}
+	defer line.Close()
+
+	var user models.User
+	if line.Next() {
+		if err = line.Scan(&user.ID, &user.Password); err != nil {
+			return models.User{}, err
+		}
+	}
+
+	return user, nil
+}
+
 // SearchByID return an user searching by id
 func (repository UsersRepository) SearchByID(ID uint64) (models.User, error) {
 	lines, err := repository.db.Query(

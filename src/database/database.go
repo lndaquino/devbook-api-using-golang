@@ -5,6 +5,11 @@ import (
 	"database/sql"
 
 	_ "github.com/go-sql-driver/mysql" // driver
+	//ORMs and tools to handle database
+	//"https://github.com/volatiletech/sqlboiler/"
+	//"https://github.com/prisma/prisma-client-go"
+	//"gorm.io/gorm"
+	//"xorm.io/xorm"
 )
 
 // Connect to database

@@ -18,6 +18,9 @@ var (
 
 	//Host serving database
 	Host = ""
+
+	// SecretKey is a Base64 key to sign jwt token
+	SecretKey = ""
 )
 
 // Load initialize enrivonment variables
@@ -38,4 +41,6 @@ func Load() {
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_NAME"))
+
+	SecretKey = os.Getenv("APP_SECRET")
 }

@@ -1,9 +1,12 @@
 package models
 
 import (
+	"api/src/security"
 	"errors"
 	"strings"
 	"time"
+
+	"github.com/badoux/checkmail"
 )
 
 // User models an user using application
@@ -22,7 +25,9 @@ func (user *User) Prepare(action string) error {
 		return err
 	}
 
-	user.format()
+	if err := user.format(action); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -30,12 +35,19 @@ func (user *User) validate(action string) error {
 	if user.Name == "" {
 		return errors.New("Invalid blank name")
 	}
+
 	if user.Nick == "" {
 		return errors.New("Invalid blank nick")
 	}
+
 	if user.Email == "" {
 		return errors.New("Invalid blank email")
 	}
+
+	if err := checkmail.ValidateFormat(user.Email); err != nil {
+		return errors.New("Invalid email format")
+	}
+
 	if action == "create" && user.Password == "" {
 		return errors.New("Invalid blank password")
 	}
@@ -43,8 +55,18 @@ func (user *User) validate(action string) error {
 	return nil
 }
 
-func (user *User) format() {
+func (user *User) format(action string) error {
 	user.Name = strings.TrimSpace(user.Name)
 	user.Nick = strings.TrimSpace(user.Nick)
 	user.Email = strings.TrimSpace(user.Email)
+
+	if action == "create" {
+		hashedPassword, err := security.Hash(user.Password)
+		if err != nil {
+			return err
+		}
+		user.Password = string(hashedPassword)
+	}
+
+	return nil
 }
