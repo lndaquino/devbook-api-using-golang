@@ -19,21 +19,27 @@ var userRoutes = []Route{
 		NeedAuthentication: true,
 	},
 	{
-		URI:                "/users/{userId}",
+		URI:                "/users/{userID}",
 		Method:             http.MethodGet,
 		Function:           controllers.SearchUser,
 		NeedAuthentication: true,
 	},
 	{
-		URI:                "/users/{userId}",
+		URI:                "/users/{userID}",
 		Method:             http.MethodPut,
 		Function:           controllers.UpdateUser,
 		NeedAuthentication: true,
 	},
 	{
-		URI:                "/users/{userId}",
+		URI:                "/users/{userID}",
 		Method:             http.MethodDelete,
 		Function:           controllers.DeleteUser,
+		NeedAuthentication: true,
+	},
+	{
+		URI:                "/users/{userID}/follow",
+		Method:             http.MethodPost,
+		Function:           controllers.FollowUser,
 		NeedAuthentication: true,
 	},
 }

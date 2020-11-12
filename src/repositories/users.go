@@ -151,3 +151,19 @@ func (repository UsersRepository) Delete(ID uint64) error {
 
 	return nil
 }
+
+// Follow register and user and a follower in database
+func (repository UsersRepository) Follow(userID, followerID uint64) error {
+	// if exists the register ignore
+	statement, err := repository.db.Prepare("insert ignore into followers (userID, followerID) values (?, ?)")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	if _, err = statement.Exec(userID, followerID); err != nil {
+		return err
+	}
+
+	return nil
+}
