@@ -13,11 +13,15 @@ values
 
 INSERT INTO followers (userID, followerID)
 values
-(1, 2),
-(1, 5),
-(1, 8),
-(1, 10),
-(2, 1),
-(2, 7),
-(5, 8),
-(6, 10);
+(15, 19),
+(16, 19),
+(17, 19),
+(18, 19);
+
+insert into posts (title, content, userID)
+values
+("User 15 Post", "It´s an user´s 15 post! Uhu!", 15),
+("User 16 Post", "It´s an user´s 16 post! Uhu!", 16),
+("User 17 Post", "It´s an user´s 17 post! Uhu!", 17),
+("User 18 Post", "It´s an user´s 18 post! Uhu!", 18),
+("User 19 Post", "It´s an user´s 19 post! Uhu!", 19);
