@@ -1,6 +1,8 @@
 package security
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"golang.org/x/crypto/bcrypt"
+)
 
 // Hash receives a string and hashs it
 func Hash(password string) ([]byte, error) {

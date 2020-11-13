@@ -167,3 +167,115 @@ func (repository UsersRepository) Follow(userID, followerID uint64) error {
 
 	return nil
 }
+
+// Unfollow deletes an following user from followers table
+func (repository UsersRepository) Unfollow(userID, followerID uint64) error {
+	statement, err := repository.db.Prepare("delete from followers where userID = ? and followerID = ?")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	if _, err = statement.Exec(userID, followerID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// SearchFollowers returns who follows an user
+func (repository UsersRepository) SearchFollowers(userID uint64) ([]models.User, error) {
+	lines, err := repository.db.Query(`
+		select u.id, u.name, u.nick, u.email, u.createdAt from users u inner join followers f
+		on u.id = f.followerID where f.userID = ?
+	`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer lines.Close()
+
+	var users []models.User
+	for lines.Next() {
+		var user models.User
+
+		if err = lines.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Nick,
+			&user.Email,
+			&user.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+
+}
+
+// Following return all users an user is following
+func (repository UsersRepository) Following(userID uint64) ([]models.User, error) {
+	lines, err := repository.db.Query(`
+		select u.id, u.name, u.nick, u.email, u.createdAt from users u inner join followers f
+		on u.id = f.userID where f.followerID = ?
+	`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer lines.Close()
+
+	var users []models.User
+	for lines.Next() {
+		var user models.User
+
+		if err = lines.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Nick,
+			&user.Email,
+			&user.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+
+}
+
+// SearchPassword returns an user password searching user by ID
+func (repository UsersRepository) SearchPassword(userID uint64) (string, error) {
+	line, err := repository.db.Query("select password from users where id = ?", userID)
+	if err != nil {
+		return "", err
+	}
+	defer line.Close()
+
+	var user models.User
+	if line.Next() {
+		if err = line.Scan(&user.Password); err != nil {
+			return "", err
+		}
+	}
+
+	return user.Password, nil
+}
+
+// UpdatePassword updates user passoword
+func (repository UsersRepository) UpdatePassword(userID uint64, password string) error {
+	statement, err := repository.db.Prepare("update users set password = ? where id = ?")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	if _, err = statement.Exec(password, userID); err != nil {
+		return err
+	}
+
+	return nil
+}

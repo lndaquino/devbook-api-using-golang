@@ -15,7 +15,7 @@ func Logger(nextFunction http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-// Authenticate check if user is authenticated to user an restrict route
+// Authenticate check if user is authenticated to use an restrict route
 func Authenticate(nextFunction http.HandlerFunc) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {

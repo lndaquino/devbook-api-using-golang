@@ -8,6 +8,7 @@ import (
 	"api/src/responses"
 	"api/src/security"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 )
@@ -41,7 +42,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = security.CheckPassword(user.Password, savedUser.Password); err != nil {
-		responses.Error(w, http.StatusUnauthorized, err)
+		responses.Error(w, http.StatusUnauthorized, errors.New("Invalid password"))
 		return
 	}
 
