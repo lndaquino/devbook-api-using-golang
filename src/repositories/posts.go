@@ -28,12 +28,12 @@ func (repository Posts) Create(post models.Post) (uint64, error) {
 		return 0, err
 	}
 
-	lastInsertId, err := result.LastInsertId()
+	lastInsertID, err := result.LastInsertId()
 	if err != nil {
 		return 0, err
 	}
 
-	return uint64(lastInsertId), nil
+	return uint64(lastInsertID), nil
 }
 
 // SearchByID returns a post from database
