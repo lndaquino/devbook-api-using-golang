@@ -64,7 +64,7 @@ func (repository Posts) SearchByID(postID uint64) (models.Post, error) {
 	return post, nil
 }
 
-// SearchPosts returns the user posts and from all users he´s following
+// SearchPosts returns user´s posts and also posts from all users he´s following
 func (repository Posts) SearchPosts(userID uint64) ([]models.Post, error) {
 	lines, err := repository.db.Query(`
 		select distinct p.*, u.nick from posts p
@@ -98,4 +98,107 @@ func (repository Posts) SearchPosts(userID uint64) ([]models.Post, error) {
 	}
 
 	return posts, nil
+}
+
+// Update updates a post´s data
+func (repository Posts) Update(postID uint64, updatedPost models.Post) error {
+	statement, err := repository.db.Prepare("update posts set title = ?, content = ? where id = ?")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	if _, err = statement.Exec(updatedPost.Title, updatedPost.Content, postID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Delete deletes a post
+func (repository Posts) Delete(postID uint64) error {
+	statement, err := repository.db.Prepare("delete from posts where id = ?")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	if _, err := statement.Exec(postID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// SearchUserPosts return all user´s posts
+func (repository Posts) SearchUserPosts(userID uint64) ([]models.Post, error) {
+	lines, err := repository.db.Query(`
+		select p.*, u.nick from posts p
+		join users u on u.id = p.userID
+		where p.userID = ?
+	`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer lines.Close()
+
+	var posts []models.Post
+
+	for lines.Next() {
+		var post models.Post
+
+		if err = lines.Scan(
+			&post.ID,
+			&post.Title,
+			&post.Content,
+			&post.UserID,
+			&post.Likes,
+			&post.CreatedAt,
+			&post.UserNick,
+		); err != nil {
+			return nil, err
+		}
+
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+
+}
+
+// Like adds one like to a post
+func (repository Posts) Like(postID uint64) error {
+	statement, err := repository.db.Prepare("update posts set likes = likes + 1 where id = ?")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	if _, err = statement.Exec(postID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Dislike subtracts one like to a post
+func (repository Posts) Dislike(postID uint64) error {
+	statement, err := repository.db.Prepare(`
+		update posts set likes = 
+		CASE
+			WHEN likes > 0 THEN likes - 1
+			ELSE likes
+		END
+		where id = ?
+	`)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	if _, err = statement.Exec(postID); err != nil {
+		return err
+	}
+
+	return nil
 }
